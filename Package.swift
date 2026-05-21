@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "GhostTerm",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS(.v14)],  // ScreenCaptureKit's SCScreenshotManager needs 14+
     products: [
         .executable(name: "ghostterm", targets: ["GhostTerm"])
     ],

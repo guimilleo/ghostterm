@@ -25,6 +25,18 @@ fi
 SWIFT_VER=$(swift --version 2>&1 | head -1)
 echo "==> Using $SWIFT_VER"
 
+# --- Preflight: stable code-signing identity -----------------------------------
+# Without this, every rebuild changes the binary signature and macOS TCC keeps
+# re-prompting for Screen Recording on every screenshot. The cert lives only in
+# your login keychain — each user generates their own.
+
+if ! security find-certificate -c "GhostTerm Local" \
+        ~/Library/Keychains/login.keychain-db >/dev/null 2>&1; then
+    echo "==> No 'GhostTerm Local' code-signing cert found. Creating one (first-time setup)."
+    ./scripts/create-signing-cert.sh
+    echo
+fi
+
 # --- Build release -------------------------------------------------------------
 
 echo "==> Building GhostTerm.app (release)"

@@ -78,13 +78,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func captureAndPaste() {
-        guard let url = ScreenshotService.captureFullScreen() else {
-            NSSound.beep()
-            return
+        ScreenshotService.captureFullScreen { [weak self] url in
+            guard let url else {
+                NSSound.beep()
+                return
+            }
+            // Trailing space so repeated presses chain naturally: each new path
+            // gets injected after the previous one.
+            self?.host.view.send(txt: url.path + " ")
         }
-        // Trailing space so repeated presses chain naturally: each new path gets
-        // injected after the previous one.
-        host.view.send(txt: url.path + " ")
     }
 
     // MARK: - Menu
