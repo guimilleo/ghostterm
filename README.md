@@ -14,22 +14,64 @@ Built natively in Swift + AppKit on top of [SwiftTerm](https://github.com/miguel
 - **Configurable hotkey** — record any modifier+key combo in Preferences, or edit `screenshotHotkey` in the config file.
 - **No network. No telemetry. No keylogging.** See [Security & privacy](#security--privacy).
 
-## Build
+## Install
 
-Requires macOS 13+, Swift 5.9+ (Command Line Tools is sufficient; full Xcode not required).
+### Prerequisites
+
+- macOS 13 (Ventura) or newer
+- Apple Command Line Tools (Swift 5.9+). Full Xcode is **not** required.
+
+If you don't have the Command Line Tools yet:
 
 ```bash
-git clone git@github.com:guimilleo/ghostterm.git
+xcode-select --install
+```
+
+Verify Swift is available:
+
+```bash
+swift --version    # should report 5.9 or later
+```
+
+### Build and install
+
+```bash
+# 1. Clone
+git clone https://github.com/guimilleo/ghostterm.git
 cd ghostterm
-./scripts/bundle.sh debug      # or `release`
+
+# 2. Build the .app bundle (release config = smaller, faster binary)
+./scripts/bundle.sh release
+
+# 3. Install into /Applications
+cp -R .build/arm64-apple-macosx/release/GhostTerm.app /Applications/
+
+# 4. Launch
+open /Applications/GhostTerm.app
+```
+
+The build script compiles via Swift Package Manager, wraps the binary into a proper `.app` bundle, and ad-hoc-signs it so macOS TCC permissions (Screen Recording) can be granted to a stable identity.
+
+To run without installing (development workflow):
+
+```bash
+./scripts/bundle.sh debug
 open .build/arm64-apple-macosx/debug/GhostTerm.app
 ```
 
-The build script compiles via SPM, then wraps the binary into a proper `.app` bundle and ad-hoc-signs it so macOS TCC permissions (Screen Recording) can be granted to a stable identity.
+### Uninstall
 
-## First run
+```bash
+rm -rf /Applications/GhostTerm.app
+rm -rf ~/.config/ghostterm
+rm -rf ~/Documents/GhostTermShots
+```
 
-On first capture you will be prompted for **Screen Recording** permission. Grant it in *System Settings → Privacy & Security → Screen Recording* and relaunch. This is required because the screenshot hotkey shells out to `/usr/sbin/screencapture`.
+Also revoke Screen Recording permission in *System Settings → Privacy & Security → Screen Recording*.
+
+### First run
+
+On first capture, macOS will prompt for **Screen Recording** permission. Grant it in *System Settings → Privacy & Security → Screen Recording*, then relaunch GhostTerm. This is required because the screenshot hotkey shells out to `/usr/sbin/screencapture`.
 
 You may also see a one-time prompt to access your **Documents folder** the first time a screenshot is saved — that's where `~/Documents/GhostTermShots/` lives.
 
