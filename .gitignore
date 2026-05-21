@@ -1,0 +1,14 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved.tmp
+
+# Xcode (in case it's opened later)
+*.xcodeproj/
+DerivedData/
+
+# macOS
+.DS_Store
+
+# Runtime state — lives in user dirs, never the repo
+*.log
