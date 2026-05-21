@@ -14,52 +14,52 @@ Built natively in Swift + AppKit on top of [SwiftTerm](https://github.com/miguel
 - **Configurable hotkey** — record any modifier+key combo in Preferences, or edit `screenshotHotkey` in the config file.
 - **No network. No telemetry. No keylogging.** See [Security & privacy](#security--privacy).
 
+## Requirements
+
+| Layer | What | Required? |
+|-------|------|-----------|
+| Runtime | macOS 13 (Ventura) or newer | yes — Apple system frameworks only, no other runtime deps |
+| Build | Apple Command Line Tools (Swift 5.9+) | yes — `xcode-select --install`. Full Xcode is **not** required. |
+| Source | [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm) | auto-fetched by Swift Package Manager during build. No further transitive deps. |
+
+That's the entire dependency surface. No Homebrew, no Node, no Python.
+
 ## Install
 
-### Prerequisites
+Pick one of the three paths below.
 
-- macOS 13 (Ventura) or newer
-- Apple Command Line Tools (Swift 5.9+). Full Xcode is **not** required.
+### Option A — Pre-built release (no build tools needed)
 
-If you don't have the Command Line Tools yet:
+1. Go to the [Releases page](https://github.com/guimilleo/ghostterm/releases) and download the latest `GhostTerm.app.zip`.
+2. Unzip and drag `GhostTerm.app` into `/Applications`.
+3. Open it with right-click → Open (the first time, to bypass Gatekeeper for an ad-hoc-signed binary).
 
-```bash
-xcode-select --install
-```
-
-Verify Swift is available:
+### Option B — One-command install from source
 
 ```bash
-swift --version    # should report 5.9 or later
-```
-
-### Build and install
-
-```bash
-# 1. Clone
 git clone https://github.com/guimilleo/ghostterm.git
 cd ghostterm
-
-# 2. Build the .app bundle (release config = smaller, faster binary)
-./scripts/bundle.sh release
-
-# 3. Install into /Applications
-cp -R .build/arm64-apple-macosx/release/GhostTerm.app /Applications/
-
-# 4. Launch
-open /Applications/GhostTerm.app
+./scripts/install.sh
 ```
 
-The build script compiles via Swift Package Manager, wraps the binary into a proper `.app` bundle, and ad-hoc-signs it so macOS TCC permissions (Screen Recording) can be granted to a stable identity.
+The `install.sh` script:
+- Verifies the Swift toolchain is present.
+- Builds in release configuration.
+- Confirms before overwriting any existing install.
+- Quits a running instance, copies the bundle to `/Applications`, strips the `com.apple.quarantine` xattr.
 
-To run without installing (development workflow):
+### Option C — Manual build (for development)
 
 ```bash
-./scripts/bundle.sh debug
+git clone https://github.com/guimilleo/ghostterm.git
+cd ghostterm
+./scripts/bundle.sh debug       # or `release`
 open .build/arm64-apple-macosx/debug/GhostTerm.app
 ```
 
-### Uninstall
+The `bundle.sh` script compiles via SPM, wraps the binary into a proper `.app` bundle, and ad-hoc-signs it so macOS TCC permissions can be granted to a stable identity. No copy to `/Applications`.
+
+## Uninstall
 
 ```bash
 rm -rf /Applications/GhostTerm.app
@@ -69,9 +69,9 @@ rm -rf ~/Documents/GhostTermShots
 
 Also revoke Screen Recording permission in *System Settings → Privacy & Security → Screen Recording*.
 
-### First run
+## First run
 
-On first capture, macOS will prompt for **Screen Recording** permission. Grant it in *System Settings → Privacy & Security → Screen Recording*, then relaunch GhostTerm. This is required because the screenshot hotkey shells out to `/usr/sbin/screencapture`.
+macOS will prompt for **Screen Recording** permission the first time you press the screenshot hotkey. Grant it in *System Settings → Privacy & Security → Screen Recording*, then relaunch GhostTerm. This is required because the hotkey shells out to `/usr/sbin/screencapture`.
 
 You may also see a one-time prompt to access your **Documents folder** the first time a screenshot is saved — that's where `~/Documents/GhostTermShots/` lives.
 
